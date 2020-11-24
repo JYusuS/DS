@@ -63,17 +63,19 @@ mkPQ xs = foldr enqueue Empty xs
 -- Cuidado con esta función. Hay que mantener que sea cola de prioridad
 mapPQ :: (Ord a, Ord b) => (a -> b) -> PQueue a -> PQueue b
 mapPQ f Empty = Empty
-mapPQ f (Node a s) = enqueue (f a) (mapPQ f s)
---mapPQ f q@(Node a s) = foldr (\f a e -> enqueue (f a) e) Empty q
+--mapPQ f (Node a s) = enqueue (f a) (mapPQ f s)
+mapPQ f q@(Node a s) = foldrPQ (\a e -> enqueue (f a) e) Empty q
 
 -- filterPQ. Crea una cola de prioridad con los elementos de la cola 
 -- de prioridad dada que cumplen el predicado.
 filterPQ :: Ord a => (a -> Bool) -> PQueue a -> PQueue a
 filterPQ f Empty = Empty
---filterPQ f  q@(Node a s) = foldr (\f a e -> if f a then enqueue a e else e) Empty q
+filterPQ f  q@(Node a s) = foldrPQ (\a e -> if f a then enqueue a e else e) Empty q
+{-
 filterPQ f q@(Node a s) 
   | f a = Node a (filterPQ f s)
   | otherwise = filterPQ f s
+-}
 
 -- foldrPQ. Realiza un plegado por la derecha de la cola de prioridad
 -- usando la funcion y el caso base dados 
@@ -189,5 +191,3 @@ instance (Ord a, Arbitrary a) => Arbitrary (PQueue a) where
     arbitrary =  do
       xs <- listOf arbitrary
       return (foldr enqueue empty xs)
-
-
